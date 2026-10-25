@@ -1,0 +1,54 @@
+title: "Catherine R. Bell"
+description: "Catherine R. Bell, Enneagram & executive coach, keynote speaker, founder of The Awakened Company, and co-author of The Creative Moment: Awaken Creativity Through the Enneagram."
+url: "https://catherinerbell.com"
+baseurl: ""
+
+permalink: /blog/:year/:month/:day/:title/
+
+markdown: kramdown
+kramdown:
+  input: GFM
+
+plugins:
+  - jekyll-feed
+
+feed:
+  path: feed.xml
+
+analytics:
+  plausible_domain: "catherinerbell.com"
+
+social:
+  linkedin: "https://www.linkedin.com/in/bellcatherine/"
+  youtube: "https://www.youtube.com/channel/UC9rym1ygYM4FZncnX24rKBw"
+  instagram: "https://www.instagram.com/theawakenedcompany/"
+
+book:
+  pub_date_iso: "2027-05-18T00:00:00-04:00"
+  pub_date_label: "May 18, 2027"
+
+nav:
+  - label: "Home"
+    url: "/"
+  - label: "The Book"
+    url: "/book/"
+  - label: "About"
+    url: "/about/"
+  - label: "Work With Catherine"
+    url: "/coaching/"
+  - label: "Media"
+    url: "/media/"
+  - label: "Blog"
+    url: "/blog/"
+  - label: "Contact"
+    url: "/contact/"
+    cta: true
+
+collections_dir: ""
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - node_modules

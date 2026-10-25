@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} | Catherine R. Bell{% else %}Catherine R. Bell{% endif %}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+  {% assign og_image = page.og_image | default: "default.jpg" %}
+  <meta property="og:title" content="{% if page.title %}{{ page.title }} | Catherine R. Bell{% else %}Catherine R. Bell{% endif %}">
+  <meta property="og:description" content="{{ page.description | default: site.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta property="og:image" content="{{ site.url }}/assets/img/og/{{ og_image }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title }} | Catherine R. Bell{% else %}Catherine R. Bell{% endif %}">
+  <meta name="twitter:description" content="{{ page.description | default: site.description }}">
+  <meta name="twitter:image" content="{{ site.url }}/assets/img/og/{{ og_image }}">
+
+  <script defer data-domain="{{ site.analytics.plausible_domain }}" src="https://plausible.io/js/script.js"></script>
+  {% feed_meta %}
+</head>
+<body>
+  {% include header.html %}
+
+  <main id="main">
+    {{ content }}
+  </main>
+  {% include newsletter.html %}
+  {% include footer.html %}
+</body>
+</html>

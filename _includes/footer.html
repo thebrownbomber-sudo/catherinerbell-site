@@ -1,0 +1,15 @@
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <nav class="footer-nav">
+      {% for item in site.nav %}
+      <a href="{{ item.url }}">{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+    <div class="social-links">
+      <a href="{{ site.social.linkedin }}" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
+      <a href="{{ site.social.youtube }}" target="_blank" rel="noopener" aria-label="YouTube">YouTube</a>
+      <a href="{{ site.social.instagram }}" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+    </div>
+    <p class="copyright">&copy; {{ site.time | date: "%Y" }} Catherine R. Bell</p>
+  </div>
+</footer>

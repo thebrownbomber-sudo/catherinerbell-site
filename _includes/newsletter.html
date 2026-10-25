@@ -1,0 +1,41 @@
+<section class="newsletter">
+  <div class="wrap">
+    <h2>Weekly Inspiration</h2>
+    <p>Sign up for reflections on creativity, the Enneagram, and awakened leadership, straight from Catherine.</p>
+    <form class="newsletter-form" id="newsletter-form" action="https://awakenedcompany.us3.list-manage.com/subscribe/post?u=bc08db543d311022c8bcb135d&amp;id=4dadafdc84&amp;f_id=0046b3e2f0" method="post" novalidate>
+      <label class="sr-only" for="mce-EMAIL">Email address</label>
+      <input type="email" id="mce-EMAIL" name="EMAIL" placeholder="Your email address" required>
+      <div aria-hidden="true" style="position: absolute; left: -5000px;">
+        <input type="text" name="b_bc08db543d311022c8bcb135d_4dadafdc84" tabindex="-1" value="">
+      </div>
+      <button type="submit">Be Inspired</button>
+    </form>
+    <p class="newsletter-status" style="display:none; margin-top:.8em; font-size:.9rem;"></p>
+    <script>
+    (function () {
+      var form = document.getElementById('newsletter-form');
+      if (!form) return;
+      var status = form.parentNode.querySelector('.newsletter-status');
+      function showStatus(msg, isError) {
+        if (!status) return;
+        status.textContent = msg;
+        status.style.color = isError ? '#ffb4a8' : '#e9defb';
+        status.style.display = 'block';
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var emailField = form.querySelector('input[type="email"]');
+        var email = emailField ? emailField.value.trim() : '';
+        if (!email || email.indexOf('@') === -1) {
+          showStatus('Please enter a valid email address.', true);
+          return;
+        }
+        var data = new FormData(form);
+        fetch(form.action, { method: 'POST', body: data, mode: 'no-cors' }).catch(function () {});
+        form.reset();
+        showStatus("You're on the list. Thank you!", false);
+      });
+    })();
+    </script>
+  </div>
+</section>

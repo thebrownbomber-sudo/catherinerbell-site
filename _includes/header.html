@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="/">Catherine&nbsp;R.&nbsp;Bell</a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </label>
+    <nav class="site-nav">
+      {% for item in site.nav %}
+      {% assign is_active = false %}
+      {% if page.url == item.url %}{% assign is_active = true %}{% endif %}
+      <a href="{{ item.url }}" class="{% if item.cta %}nav-cta{% endif %}{% if is_active %} active{% endif %}">{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+</header>

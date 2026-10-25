@@ -1,0 +1,75 @@
+---
+layout: default
+title: "Contact"
+description: "Get in touch with Catherine R. Bell for coaching, speaking, or media inquiries."
+permalink: "/contact/"
+---
+
+<section class="page-hero">
+<div class="wrap narrow center">
+<div class="portrait small" style="margin-bottom: 1.6em;">
+<img alt="Catherine R. Bell" src="/assets/img/catherine-headshot.jpg"/>
+</div>
+<span class="eyebrow">Get in touch</span>
+<h1>Get in Touch with Catherine</h1>
+<p style="color: var(--ink-soft);">“Become so crystal clear in my being that all debris not meant for me is cleared away.” (Catherine Bell)</p>
+</div>
+</section>
+<section>
+<div class="wrap narrow">
+<form action="https://formspree.io/f/maeewkrw" class="card" id="contact-form" method="post" style="display: grid; gap: 16px;">
+<input name="_subject" type="hidden" value="New message from the catherinerbell.com contact form"/>
+<input name="_source" type="hidden" value="catherinerbell.com"/>
+<input autocomplete="off" name="_gotcha" style="display:none" tabindex="-1" type="text"/>
+<div>
+<label for="name">Name</label><br/>
+<input id="name" name="name" required="" style="width:100%; padding:.7em; border-radius:8px; border:1px solid #ddd;" type="text"/>
+</div>
+<div>
+<label for="cemail">Email</label><br/>
+<input id="cemail" name="email" required="" style="width:100%; padding:.7em; border-radius:8px; border:1px solid #ddd;" type="email"/>
+</div>
+<div>
+<label for="subject">Subject</label><br/>
+<input id="subject" name="subject" required="" style="width:100%; padding:.7em; border-radius:8px; border:1px solid #ddd;" type="text"/>
+</div>
+<div>
+<label for="message">Message</label><br/>
+<textarea id="message" name="message" required="" rows="5" style="width:100%; padding:.7em; border-radius:8px; border:1px solid #ddd;"></textarea>
+</div>
+<button class="btn" type="submit">Send message</button>
+<p class="contact-status" style="display:none; font-size:.92rem;"></p>
+</form>
+<script>
+    (function () {
+      var form = document.getElementById('contact-form');
+      if (!form) return;
+      var status = form.querySelector('.contact-status');
+      function showStatus(msg, isError) {
+        if (!status) return;
+        status.textContent = msg;
+        status.style.color = isError ? '#b3261e' : 'var(--plum)';
+        status.style.display = 'block';
+      }
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var data = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        }).then(function (res) {
+          if (res.ok) {
+            form.reset();
+            showStatus("Thank you, your message has been sent. Catherine's team will be in touch soon.", false);
+          } else {
+            showStatus('Something went wrong sending your message. Please try again, or email info@awakenedcompany.com directly.', true);
+          }
+        }).catch(function () {
+          showStatus('Something went wrong sending your message. Please try again, or email info@awakenedcompany.com directly.', true);
+        });
+      });
+    })();
+    </script>
+</div>
+</section>

@@ -1,0 +1,184 @@
+---
+layout: default
+description: "Catherine R. Bell, Enneagram & executive coach, keynote speaker, founder of The Awakened Company, and co-author of The Creative Moment: Awaken Creativity Through the Enneagram."
+---
+
+<section class="hero">
+<div class="wrap hero-inner">
+<div>
+<span class="eyebrow">Enneagram &amp; Executive Coach · Author · Speaker · Facilitator</span>
+<h1>Live Into Your Potential</h1>
+<p class="lede">Catherine R. Bell helps individuals and organizations awaken through the Enneagram, and her new book, co-authored with Russ Hudson, shows you how to turn that awakening into creativity.</p>
+<div class="hero-actions">
+<a class="btn gold" href="/book/">Pre-order The Creative Moment</a>
+<a class="btn outline" href="/coaching/">Work with Catherine</a>
+</div>
+</div>
+<div class="hero-art">
+<a href="/book/#pre-order"><img alt="The Creative Moment book cover" src="/assets/img/the-creative-moment-cover.jpg"/></a>
+</div>
+</div>
+</section>
+<section class="press-strip">
+<div class="wrap center">
+<p class="press-strip-label">As featured in</p>
+<p class="press-strip-list">Fortune · Harvard Business Review · Profit · Conscious Company Magazine · Women of Influence</p>
+</div>
+</section>
+<section class="tint">
+<div class="wrap narrow center">
+<span class="eyebrow">There is an awakening…</span>
+<p style="font-size:1.1rem; color: var(--ink);">People are searching for meaning, in life, in work, in play. At the root of finding meaning is your relationship and connection to your awakened self. Once you are in touch with your inner compass and aim, you can make positive decisions toward the world you want to create.</p>
+</div>
+</section>
+<section>
+<div class="wrap">
+<div class="center" style="margin-bottom: 2.5em;">
+<span class="eyebrow">Ways to work with Catherine</span>
+<h2>Coaching, Keynotes &amp; Creative Facilitation</h2>
+</div>
+<div class="grid">
+<div class="card">
+<h3>Enneagram Coaching</h3>
+<p>Riso-Hudson certified, Catherine uses the Enneagram's nine Points as a roadmap to help clients understand their unique gifts and impact.</p>
+<a href="/coaching/#enneagram">Learn more →</a>
+</div>
+<div class="card">
+<h3>Executive Coaching</h3>
+<p>Catherine takes on a limited number of CEOs and leadership teams for a deep, one-on-one coaching experience.</p>
+<a href="/coaching/#executive">Learn more →</a>
+</div>
+<div class="card">
+<h3>Keynotes &amp; Unique Creative Facilitation</h3>
+<p>A sought-after keynote speaker on mindfulness, creativity, and awakening corporate culture.</p>
+<a href="/coaching/#keynotes">Learn more →</a>
+</div>
+</div>
+</div>
+</section>
+<section class="tint">
+<div class="wrap portrait-block">
+<div class="portrait">
+<img alt="Catherine R. Bell" src="/assets/img/catherine-headshot.jpg"/>
+</div>
+<div>
+<span class="eyebrow">Meet Catherine</span>
+<p class="fp-intro">Hi, I'm Catherine. I've spent over 20 years helping leaders and organizations find their inner awakening, and I'd love to help you find yours too.</p>
+<h2>An Enneagram &amp; executive coach, keynote speaker, facilitator, and bestselling author</h2>
+<p>Catherine R. Bell is a serial entrepreneur, business leader, and public speaker who has spent over 20 years helping organizations and individuals find their inner awakening. She's the founder of The Awakened Company and the bestselling author of the book of the same name, and her newest book, <em>The Creative Moment</em>, releases May 18, 2027.</p>
+<p class="proof-points" style="color: var(--ink-soft); font-size: .92rem; margin-top: -.4em;">20+ years of experience · Nautilus Book Award winner · Amazon Best Seller</p>
+<a class="btn outline" href="/about/">Learn more about Catherine →</a>
+</div>
+</div>
+</section>
+<section class="deep">
+<div class="wrap">
+<div class="center" style="margin-bottom: 2em;">
+<span class="eyebrow">Testimonials</span>
+<h2>What Clients Say</h2>
+</div>
+<div aria-live="polite" class="testimonial-carousel" id="home-testimonial-carousel">
+<button aria-label="Previous testimonial" class="carousel-arrow prev" id="htc-prev">←</button>
+<blockquote class="testimonial carousel-slide" style="background: rgba(255,255,255,.06); border-left-color: var(--gold); color: #fff;">
+<p class="carousel-quote" id="htc-quote"></p>
+<cite id="htc-cite" style="color:#e6d9f5;"></cite>
+</blockquote>
+<button aria-label="Next testimonial" class="carousel-arrow next" id="htc-next">→</button>
+<div class="carousel-progress"><div class="carousel-progress-bar" id="htc-progress"></div></div>
+<p class="carousel-count" id="htc-count"></p>
+</div>
+<div class="center" style="margin-top: 2em;">
+<a class="btn outline" href="/coaching/#testimonial-carousel" style="border-color: rgba(255,255,255,.4); color: #fff;">Read more client stories →</a>
+</div>
+</div>
+</section>
+<script>
+(function () {
+  var TESTIMONIALS = [
+    { q: "Catherine brings a rare combination of emotional intelligence, clarity of vision, and practical execution that consistently elevates the teams she engages with. Strategically, she has a keen ability to frame complex challenges, uncover core opportunities, and build pathways forward that are both innovative and achievable.", n: "Karl Hendrickson, CPA, CA", t: "Partner, Collaborative Business &amp; Tax Advisor" },
+    { q: "Catherine was our keynote speaker at our Corporate Retreat; the feedback we received from the team was overwhelming. Her unique ability to individually connect with a room full of people, her passion and dedication to building awakened teams, hit home.", n: "Sophie Blais, CFP, CHS", t: "President" },
+    { q: "We highly recommend Catherine Bell as a facilitator for your next team building event, particularly if you appreciate an authentic and unique approach to team development.", n: "Karen MacDonald", t: "COO, Viewpoint Group" }
+  ];
+
+  var el = document.getElementById('home-testimonial-carousel');
+  if (!el) return;
+  var quoteEl = document.getElementById('htc-quote');
+  var citeEl = document.getElementById('htc-cite');
+  var countEl = document.getElementById('htc-count');
+  var progressEl = document.getElementById('htc-progress');
+  var prevBtn = document.getElementById('htc-prev');
+  var nextBtn = document.getElementById('htc-next');
+  var i = 0;
+  var DURATION = 10000;
+  var timer = null;
+  var progressStart = null;
+  var rafId = null;
+
+  function render() {
+    var item = TESTIMONIALS[i];
+    quoteEl.innerHTML = '&ldquo;' + item.q + '&rdquo;';
+    citeEl.innerHTML = item.n + ', ' + item.t;
+    countEl.textContent = (i + 1) + ' / ' + TESTIMONIALS.length;
+  }
+
+  function tickProgress(ts) {
+    if (!progressStart) progressStart = ts;
+    var elapsed = ts - progressStart;
+    var pct = Math.min(100, (elapsed / DURATION) * 100);
+    progressEl.style.width = pct + '%';
+    if (elapsed < DURATION) {
+      rafId = requestAnimationFrame(tickProgress);
+    }
+  }
+
+  function resetProgress() {
+    progressStart = null;
+    progressEl.style.width = '0%';
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tickProgress);
+  }
+
+  function goTo(idx) {
+    i = (idx + TESTIMONIALS.length) % TESTIMONIALS.length;
+    render();
+    resetProgress();
+    restartTimer();
+  }
+
+  function next() { goTo(i + 1); }
+  function prev() { goTo(i - 1); }
+
+  function restartTimer() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(next, DURATION);
+  }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+  el.addEventListener('mouseenter', function () {
+    if (timer) clearInterval(timer);
+    if (rafId) cancelAnimationFrame(rafId);
+  });
+  el.addEventListener('mouseleave', function () {
+    resetProgress();
+    restartTimer();
+  });
+
+  render();
+  resetProgress();
+  restartTimer();
+})();
+</script>
+<section>
+<div class="wrap book-block">
+<div class="book-cover">
+<a href="/book/#pre-order"><img alt="The Creative Moment book cover" src="/assets/img/the-creative-moment-cover.jpg"/></a>
+</div>
+<div>
+<span class="eyebrow">Available May 18, 2027</span>
+<h2>The Creative Moment</h2>
+<p>At a time when machines can generate words, images, and ideas in seconds, <em>The Creative Moment</em> asks a more urgent question: what remains uniquely human about creativity? Catherine R. Bell and Russ Hudson invite readers to unlock a powerful new doorway into creative life: the Nine Enneagram Points.</p>
+<a class="btn" href="/book/">Pre-order now →</a>
+</div>
+</div>
+</section>
