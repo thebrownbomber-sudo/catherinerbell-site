@@ -1,0 +1,64 @@
+name: Weekly Ninth Moment draft
+
+# Runs every Thursday at 9am Mountain Time (15:00 UTC during MDT, 16:00 UTC
+# during MST -- GitHub Actions cron is always UTC and doesn't shift for DST,
+# so this is set for MDT; adjust the hour by 1 if it starts landing an hour
+# off after a daylight-saving change). Giving a few days before the Monday
+# newsletter send leaves time to review and merge.
+#
+# You can also fire this manually any time from the Actions tab (see
+# workflow_dispatch below) without waiting for the schedule.
+on:
+  schedule:
+    - cron: "0 15 * * 4"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  draft-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Draft the post
+        id: draft
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Uncomment and set this repo VARIABLE (not secret) to override
+          # the default model without editing this file:
+          # ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL }}
+        run: python .github/scripts/draft_weekly_post.py
+
+      - name: Create branch, commit, and open PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          BRANCH="ninth-moment/${{ steps.draft.outputs.post_filename }}"
+          BRANCH="${BRANCH%.html}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add "_posts/${{ steps.draft.outputs.post_filename }}"
+          git commit -m "Draft: ${{ steps.draft.outputs.post_title }}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "New Ninth Moment draft: ${{ steps.draft.outputs.post_title }}" \
+            --body "Weekly auto-drafted post, ready for review. Read it on the **Files changed** tab (it renders as a diff of the new file). Merge this PR to publish it to the live site -- GitHub Pages will rebuild automatically within a minute or two of merging, and Monday's Mailchimp RSS check will pick it up and email it to the Weekly Inspiration list.
+
+If it needs changes, leave a comment on this PR describing what to revise, or just close it without merging and nothing gets published." \
+            --base master \
+            --head "$BRANCH" \
+            --reviewer "${{ github.repository_owner }}"
