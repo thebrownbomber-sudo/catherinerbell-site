@@ -54,11 +54,15 @@ jobs:
           git commit -m "Draft: ${{ steps.draft.outputs.post_title }}"
           git push origin "$BRANCH"
 
+          cat > pr_body.txt <<'BODY_EOF'
+          Weekly auto-drafted post, ready for review. Read it on the **Files changed** tab (it renders as a diff of the new file). Merge this PR to publish it to the live site -- GitHub Pages will rebuild automatically within a minute or two of merging, and Monday's Mailchimp RSS check will pick it up and email it to the Weekly Inspiration list.
+
+          If it needs changes, leave a comment on this PR describing what to revise, or just close it without merging and nothing gets published.
+          BODY_EOF
+
           gh pr create \
             --title "New Ninth Moment draft: ${{ steps.draft.outputs.post_title }}" \
-            --body "Weekly auto-drafted post, ready for review. Read it on the **Files changed** tab (it renders as a diff of the new file). Merge this PR to publish it to the live site -- GitHub Pages will rebuild automatically within a minute or two of merging, and Monday's Mailchimp RSS check will pick it up and email it to the Weekly Inspiration list.
-
-If it needs changes, leave a comment on this PR describing what to revise, or just close it without merging and nothing gets published." \
+            --body-file pr_body.txt \
             --base master \
             --head "$BRANCH" \
             --reviewer "${{ github.repository_owner }}"
