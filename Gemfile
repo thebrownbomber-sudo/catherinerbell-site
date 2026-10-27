@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "github-pages", group: :jekyll_plugins
 gem "jekyll-feed"
+gem "jekyll-sitemap"
 
 # Windows and JRuby does not include zoneinfo files
 install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
