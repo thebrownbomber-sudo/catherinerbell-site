@@ -34,7 +34,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: checks
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 35
     permissions:
       pages: write
       id-token: write
@@ -48,12 +48,20 @@ jobs:
           name: site
           path: _site
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      # A unique package name per attempt, so "Re-run failed jobs" works
+      # (otherwise the re-run finds two packages and refuses to publish).
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: _site
+          name: github-pages-${{ github.run_attempt }}
       - name: Publish
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
+          # GitHub's first publish after switching to Actions (domain and
+          # HTTPS re-check) can take longer than the 10-minute default.
+          timeout: 1800000
 
   smoke:
     name: Smoke test live site
