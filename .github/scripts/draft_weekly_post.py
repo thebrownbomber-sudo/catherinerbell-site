@@ -8,6 +8,7 @@ Does NOT commit, push, or open a PR -- the workflow file handles that after
 this script exits successfully. This script's only job is to produce one
 valid _posts/YYYY-MM-DD-slug.html file, or fail loudly and write nothing.
 """
+
 import datetime
 import json
 import os
@@ -22,11 +23,16 @@ POSTS_DIR = REPO_ROOT / "_posts"
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 # Override via the ANTHROPIC_MODEL repo variable if this ever needs to change.
 # Check console.anthropic.com for the current list of available model IDs.
-MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-5")
+# "or" (not a get() default) so an unset repo variable, which arrives as an
+# empty string, still falls back to the default model.
+MODEL = os.environ.get("ANTHROPIC_MODEL") or "claude-opus-4-5"
 
 if not ANTHROPIC_API_KEY:
-    print("ERROR: ANTHROPIC_API_KEY is not set. Add it as a repo secret "
-          "(Settings -> Secrets and variables -> Actions).", file=sys.stderr)
+    print(
+        "ERROR: ANTHROPIC_API_KEY is not set. Add it as a repo secret "
+        "(Settings -> Secrets and variables -> Actions).",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 
@@ -47,14 +53,16 @@ def load_existing_posts():
             if ":" in line:
                 k, _, v = line.partition(":")
                 fm[k.strip()] = v.strip().strip('"')
-        posts.append({
-            "filename": f.name,
-            "title": fm.get("title", ""),
-            "author": fm.get("author", ""),
-            "ai_drafted": fm.get("ai_drafted", "false"),
-            # first ~400 chars of body, stripped of tags, just for context
-            "excerpt": re.sub(r"<[^>]+>", " ", body)[:400].strip(),
-        })
+        posts.append(
+            {
+                "filename": f.name,
+                "title": fm.get("title", ""),
+                "author": fm.get("author", ""),
+                "ai_drafted": fm.get("ai_drafted", "false"),
+                # first ~400 chars of body, stripped of tags, just for context
+                "excerpt": re.sub(r"<[^>]+>", " ", body)[:400].strip(),
+            }
+        )
     return posts
 
 
@@ -108,10 +116,7 @@ def build_user_prompt(existing_posts):
         "throughline naturally:\n",
     ]
     for p in reversed(existing_posts):
-        lines.append(
-            f"- \"{p['title']}\" (by {p['author'] or 'unknown'}): "
-            f"{p['excerpt']}..."
-        )
+        lines.append(f'- "{p["title"]}" (by {p["author"] or "unknown"}): {p["excerpt"]}...')
     lines.append(
         "\nWrite the next post in this series now. Pick whatever specific "
         "angle feels like the genuine next step in the throughline, not "
@@ -121,12 +126,14 @@ def build_user_prompt(existing_posts):
 
 
 def call_claude(system_prompt, user_prompt):
-    payload = json.dumps({
-        "model": MODEL,
-        "max_tokens": 4096,
-        "system": system_prompt,
-        "messages": [{"role": "user", "content": user_prompt}],
-    }).encode("utf-8")
+    payload = json.dumps(
+        {
+            "model": MODEL,
+            "max_tokens": 4096,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": user_prompt}],
+        }
+    ).encode("utf-8")
 
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
@@ -141,6 +148,63 @@ def call_claude(system_prompt, user_prompt):
     with urllib.request.urlopen(req, timeout=120) as resp:
         data = json.loads(resp.read().decode("utf-8"))
     return data["content"][0]["text"]
+
+
+# Tags the AI is allowed to emit in a post body. Everything else (script,
+# iframe, style, form, object, embed, svg, etc.) is stripped before the file
+# is written, so a bad or manipulated model response can never ship active
+# content to the live site.
+ALLOWED_TAGS = {
+    "p",
+    "h2",
+    "h3",
+    "h4",
+    "em",
+    "strong",
+    "b",
+    "i",
+    "blockquote",
+    "ul",
+    "ol",
+    "li",
+    "a",
+    "br",
+    "hr",
+    "span",
+}
+DANGEROUS_BLOCKS = re.compile(
+    r"<(script|style|iframe|object|embed|form|svg|math|template|noscript)"
+    r"\b[^>]*>.*?</\1\s*>",
+    re.I | re.S,
+)
+
+
+def sanitize_html(html):
+    """Whitelist-based cleanup of the model's body HTML."""
+    html = DANGEROUS_BLOCKS.sub("", html)
+
+    def clean_tag(m):
+        closing, name, attrs = m.group(1), m.group(2).lower(), m.group(3)
+        if name not in ALLOWED_TAGS:
+            return ""
+        if closing:
+            return f"</{name}>"
+        if name == "a":
+            href = re.search(r'href\s*=\s*"([^"]*)"', attrs, re.I)
+            url = href.group(1).strip() if href else ""
+            if not re.match(r"^(https://|/)", url):
+                return "<a>"
+            return f'<a href="{url}" rel="noopener">'
+        return f"<{name}>"
+
+    # Drops every attribute (so no onclick=, style=, javascript: URLs)
+    # except a vetted href on links.
+    return re.sub(r"<(/?)([a-zA-Z][a-zA-Z0-9]*)\b([^>]*)>", clean_tag, html)
+
+
+def one_line(value):
+    """Collapse to a single safe line (no newlines/control chars)."""
+    return re.sub(r"[\x00-\x1f\x7f]+", " ", value).strip()
 
 
 def slugify(title):
@@ -169,19 +233,21 @@ def main():
         print(f"Raw output was:\n{raw}", file=sys.stderr)
         sys.exit(1)
 
-    title = parsed.get("title", "").strip()
-    body_html = parsed.get("body_html", "").strip()
+    title = one_line(str(parsed.get("title", "")))[:200]
+    body_html = sanitize_html(str(parsed.get("body_html", "")).strip())
 
     if not title or len(body_html) < 400:
-        print("ERROR: draft failed basic validation (missing title or "
-              "body too short). Refusing to write a file.", file=sys.stderr)
+        print(
+            "ERROR: draft failed basic validation (missing title or "
+            "body too short). Refusing to write a file.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     today = datetime.date.today()
     slug = slugify(title)
     if not slug:
-        print("ERROR: could not derive a usable slug from the title.",
-              file=sys.stderr)
+        print("ERROR: could not derive a usable slug from the title.", file=sys.stderr)
         sys.exit(1)
 
     filename = f"{today.isoformat()}-{slug}.html"
@@ -190,7 +256,10 @@ def main():
     front_matter = (
         "---\n"
         "layout: post\n"
-        f'title: "{title}"\n'
+        # json.dumps gives a correctly escaped double-quoted string, which is
+        # also valid YAML. A raw f-string here broke the Jekyll build any time
+        # the title contained a double quote.
+        f"title: {json.dumps(title, ensure_ascii=False)}\n"
         'author: "The Ninth Moment"\n'
         "ai_drafted: true\n"
         "---\n\n"
@@ -202,7 +271,7 @@ def main():
     gh_output = os.environ.get("GITHUB_OUTPUT")
     if gh_output:
         with open(gh_output, "a", encoding="utf-8") as f:
-            f.write(f"post_title={title}\n")
+            f.write(f"post_title={one_line(title)}\n")
             f.write(f"post_filename={filename}\n")
 
 

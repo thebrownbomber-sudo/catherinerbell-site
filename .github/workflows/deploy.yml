@@ -1,0 +1,85 @@
+name: Deploy site
+
+# The ONLY way the live site changes.
+#
+#   push to master  ->  all 6 CI checks  ->  deploy to GitHub Pages
+#                                         ->  smoke test the live site
+#
+# If any check fails, nothing is deployed and the site keeps serving the
+# last good version. If the post-deploy smoke test fails, the run goes red
+# and GitHub emails the repo owner. See SECURITY-AND-CI.md for rollback.
+#
+# Requires: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch: {}
+
+permissions: {}
+
+# Never run two deploys at once, and never cancel one halfway through.
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    name: CI checks
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      pull-requests: read
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Get the tested build
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: site
+          path: _site
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: _site
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+
+  smoke:
+    name: Smoke test live site
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: site
+          path: _site # only used to read the list of pages from sitemap.xml
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Wait for the CDN to pick up the new version
+        run: sleep 45
+      - name: Read-only smoke tests against https://catherinerbell.com
+        run: npx playwright test --grep @smoke
+        env:
+          CI: "true"
+          BASE_URL: https://catherinerbell.com

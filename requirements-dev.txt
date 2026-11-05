@@ -1,0 +1,4 @@
+# Lint tools for CI (kept current by Dependabot)
+ruff==0.16.9
+yamllint==1.35.1
+actionlint-py==1.7.12.25

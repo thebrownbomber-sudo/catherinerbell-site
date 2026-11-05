@@ -1,0 +1,17 @@
+# Secret-scan config. Uses gitleaks' full default rule set, plus an allowlist
+# for IDs that are PUBLIC BY DESIGN: they sit in the page HTML that every
+# visitor's browser downloads, so they are not secrets and can't be abused
+# to read data (Formspree form ID, Mailchimp list IDs, Google Search Console
+# verification token). Never add a real API key here.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public client-side identifiers"
+regexes = [
+  '''bc08db543d311022c8bcb135d''',
+  '''4dadafdc84''',
+  '''0046b3e2f0''',
+  '''maeewkrw''',
+  '''0tnQ1znGX-vI4QAmYc1QSctx2RhRrCLFN1prfJzY6j4''',
+]

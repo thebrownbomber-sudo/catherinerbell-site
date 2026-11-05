@@ -1,0 +1,5 @@
+# Any change to automation, CI or security settings needs the owner's eyes.
+/.github/        @thebrownbomber-sudo
+/CNAME           @thebrownbomber-sudo
+/_config.yml     @thebrownbomber-sudo
+/_layouts/       @thebrownbomber-sudo

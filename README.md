@@ -46,7 +46,11 @@ in `_config.yml`.
 
 ## Deploying
 
-Pushing to `main` on GitHub, with GitHub Pages enabled for this repo
-(Settings -> Pages -> Deploy from a branch -> main), rebuilds and
-publishes the site automatically. A custom domain and HTTPS are also
-configured under Settings -> Pages.
+Changes go through a pull request into `master`. Six automated checks
+(lint, build, HTML and links, content guard, secret scan, Playwright
+end-to-end tests) must pass before a PR can merge, and the deploy workflow
+re-runs them before publishing to GitHub Pages. A failing check means the
+live site is never touched.
+
+Full details, required GitHub settings, and rollback steps:
+[SECURITY-AND-CI.md](SECURITY-AND-CI.md).
