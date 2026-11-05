@@ -56,6 +56,20 @@ test.describe("every page @smoke", () => {
     }
   });
 
+  test("privacy: newsletter consent notice and footer privacy link", async ({ page }) => {
+    await page.goto("/");
+    const consent = page.locator(".newsletter-consent");
+    await expect(consent).toContainText("Unsubscribe anytime");
+    await expect(consent.getByRole("link", { name: "Privacy policy" })).toHaveAttribute("href", "/privacy/");
+    await expect(page.locator("footer").getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy/");
+  });
+
+  test("privacy page loads and names the contact for requests", async ({ page }) => {
+    await page.goto("/privacy/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Privacy Policy");
+    await expect(page.locator("main")).toContainText("info@awakenedcompany.com");
+  });
+
   test("Search Console verification tag is present", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator('meta[name="google-site-verification"]')).toHaveCount(1);
