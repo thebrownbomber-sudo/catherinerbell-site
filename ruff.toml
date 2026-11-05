@@ -1,0 +1,8 @@
+# Python lint for the automation scripts in .github/scripts
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "F", "W", "B", "S", "UP", "I"]
+# S310: urllib.urlopen on a fixed https:// URL is intended here.
+ignore = ["S310", "S603", "S607"]

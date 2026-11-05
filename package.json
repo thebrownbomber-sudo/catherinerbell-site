@@ -1,0 +1,18 @@
+{
+  "name": "catherinerbell-site",
+  "private": true,
+  "description": "Lint and end-to-end tests for catherinerbell.com. Not needed to edit content.",
+  "scripts": {
+    "lint:css": "stylelint \"assets/css/**/*.css\"",
+    "lint:html": "html-validate \"_site/**/*.html\"",
+    "test:e2e": "playwright test",
+    "test:smoke": "playwright test --grep @smoke"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.63.0",
+    "html-validate": "11.18.0",
+    "stylelint": "18.0.0",
+    "stylelint-config-recommended": "19.0.0"
+  }
+}

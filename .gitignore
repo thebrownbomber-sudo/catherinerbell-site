@@ -1,8 +1,37 @@
+# ---- Jekyll build output ----
 _site/
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata
 vendor/
 .bundle/
-Gemfile.lock
+
+# ---- Test tooling ----
+node_modules/
+playwright-report/
+test-results/
+blob-report/
+.ruff_cache/
+__pycache__/
+
+# ---- SECRETS: never commit these ----
+# Real keys belong in GitHub -> Settings -> Environments -> ninth-moment.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+credentials*.json
+service-account*.json
+secrets.*
+*.secret
+
+# ---- OS / editor ----
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/

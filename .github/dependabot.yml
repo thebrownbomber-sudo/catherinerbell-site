@@ -1,0 +1,32 @@
+# Weekly pull requests that keep pinned tools current and patch security
+# issues. Each one runs through the full CI before it can merge.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      gems:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      test-tooling:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      lint-tooling:
+        patterns: ["*"]

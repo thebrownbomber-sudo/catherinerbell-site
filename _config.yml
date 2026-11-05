@@ -49,7 +49,16 @@ collections_dir: ""
 
 exclude:
   - README.md
+  - SECURITY-AND-CI.md
   - Gemfile
   - Gemfile.lock
   - vendor
   - node_modules
+  - package.json
+  - package-lock.json
+  - playwright.config.ts
+  - tests
+  - playwright-report
+  - test-results
+  - requirements-dev.txt
+  - ruff.toml

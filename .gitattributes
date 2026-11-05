@@ -1,0 +1,3 @@
+# Auto-generated lockfiles: collapse them in GitHub diffs and stats.
+package-lock.json linguist-generated=true -diff
+Gemfile.lock linguist-generated=true -diff
