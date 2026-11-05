@@ -307,6 +307,8 @@ blockquote.testimonial cite { display: block; margin-top: 1em; font-style: norma
 .newsletter { background: var(--plum); color: #fff; text-align: center; }
 .newsletter h2 { color: #fff; }
 .newsletter p { color: #e6d9f5; max-width: 50ch; margin: 0 auto 1.4em; }
+.newsletter p.newsletter-consent { font-size: .82rem; margin: 1em auto 0; opacity: .85; }
+.newsletter p.newsletter-consent a { color: inherit; text-decoration: underline; }
 .newsletter-form { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; max-width: 480px; margin: 0 auto; }
 .newsletter-form input {
   flex: 1 1 240px; padding: .8em 1em; border-radius: 999px; border: none; font-family: var(--sans);
@@ -324,6 +326,7 @@ blockquote.testimonial cite { display: block; margin-top: 1em; font-style: norma
 .footer-nav a, .social-links a { color: var(--ink-soft); text-decoration: none; font-size: .9rem; }
 .social-links { display: flex; gap: 1em; }
 .copyright { width: 100%; text-align: center; font-size: .8rem; color: var(--ink-soft); order: 3; margin-top: 8px; }
+.copyright a { color: inherit; text-decoration: underline; }
 
 /* ---------- blog bylines ---------- */
 .byline { font-size: .9rem; color: var(--ink-soft); margin: -.6em 0 1.6em; }
