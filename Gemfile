@@ -18,4 +18,4 @@ install_if -> { RUBY_PLATFORM =~ %r!mingw|mswin|java! } do
   gem "tzinfo-data"
 end
 
-gem "wdm", "~> 0.1.1", install_if: Gem.win_platform?
+gem "wdm", "~> 0.2.0", install_if: Gem.win_platform?
