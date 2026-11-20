@@ -120,6 +120,8 @@ jobs:
           The CI checks run automatically on this PR. Once they are green, merge it to publish: the deploy workflow rebuilds the site, tests it, and only then puts it live. Monday's Mailchimp RSS check will pick it up and email it to the Weekly Inspiration list.
 
           If it needs changes, leave a comment on this PR describing what to revise, or just close it without merging and nothing gets published.
+
+          Catherine is emailed a readable copy of this draft automatically. Apply her edits on this PR's branch, then merge once she approves.
           BODY_EOF
 
           gh pr create \
@@ -134,3 +136,44 @@ jobs:
           # and its results attach to this branch's commit, so the PR still
           # gets all of its required checks.
           gh workflow run ci.yml --ref "$BRANCH"
+
+  # Emails the draft to Catherine as a readable, branded email so she never
+  # has to open GitHub. This job can't touch the repo (no permissions) and
+  # never sees the Anthropic key; it only gets the mail login.
+  email-review:
+    needs: [draft, open-pr]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: ninth-moment
+    permissions: {}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get the draft file
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: draft-post
+          path: _posts
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Email the draft to Catherine
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
+          REVIEW_TO: ${{ vars.REVIEW_TO }}
+          REVIEW_CC: ${{ vars.REVIEW_CC }}
+          POST_FILENAME: ${{ needs.draft.outputs.post_filename }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$POST_FILENAME" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+\.html$ ]]; then
+            echo "Unexpected post filename: $POST_FILENAME" >&2
+            exit 1
+          fi
+          python .github/scripts/email_draft_for_review.py "_posts/$POST_FILENAME"
