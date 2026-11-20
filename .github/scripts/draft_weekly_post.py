@@ -125,13 +125,13 @@ def build_user_prompt(existing_posts):
     return "\n".join(lines)
 
 
-def call_claude(system_prompt, user_prompt):
+def call_claude(system_prompt, messages):
     payload = json.dumps(
         {
             "model": MODEL,
             "max_tokens": 4096,
             "system": system_prompt,
-            "messages": [{"role": "user", "content": user_prompt}],
+            "messages": messages,
         }
     ).encode("utf-8")
 
@@ -214,27 +214,86 @@ def slugify(title):
     return s[:60].rstrip("-")
 
 
-def main():
-    existing_posts = load_existing_posts()
-    user_prompt = build_user_prompt(existing_posts)
+# Same house-style patterns content_guard.py enforces (keep the two in sync).
+# The draft is checked here first so the model can fix its own slips instead
+# of the whole weekly run failing at the guard step.
+DASH = re.compile(r"[\u2014\u2013]|&[mn]dash;|&#(8212|8211|x2014|x2013);", re.I)
+TYPE_WORDS = re.compile(
+    r"\b(Type\s+[1-9]|Types\s+[1-9]|Enneagram\s+types?|nine\s+types|"
+    r"personality\s+types?)\b",
+    re.I,
+)
+MAX_ATTEMPTS = 3
 
-    raw = call_claude(STYLE_GUIDE, user_prompt)
 
+def parse_draft(raw):
+    """Return (title, body_html), or raise ValueError with a reason."""
     # The model should return pure JSON per the style guide, but strip any
     # accidental code-fence wrapping defensively before parsing.
     cleaned = raw.strip()
     cleaned = re.sub(r"^```(json)?\s*", "", cleaned)
     cleaned = re.sub(r"\s*```$", "", cleaned)
-
     try:
         parsed = json.loads(cleaned)
     except json.JSONDecodeError as e:
-        print(f"ERROR: model did not return valid JSON: {e}", file=sys.stderr)
-        print(f"Raw output was:\n{raw}", file=sys.stderr)
-        sys.exit(1)
-
+        raise ValueError(f"the response was not valid JSON ({e})") from e
     title = one_line(str(parsed.get("title", "")))[:200]
     body_html = sanitize_html(str(parsed.get("body_html", "")).strip())
+    return title, body_html
+
+
+def house_style_problems(title, body_html):
+    text = title + "\n" + re.sub(r"<[^>]+>", " ", body_html)
+    problems = []
+    if DASH.search(text):
+        problems.append(
+            "It contains an em dash or en dash. Replace every one with a comma, "
+            "colon, semicolon or parentheses."
+        )
+    hits = sorted({m.group(0) for m in TYPE_WORDS.finditer(text)})
+    if hits:
+        problems.append(
+            "It uses " + ", ".join(f'"{h}"' for h in hits) + ". House style never "
+            'says "type" for the Enneagram: use "Point" (e.g. "Point 4", "the '
+            'nine Points"), and rephrase "personality type(s)" entirely (e.g. '
+            '"personality", "Point", "pattern").'
+        )
+    return problems
+
+
+def main():
+    existing_posts = load_existing_posts()
+    messages = [{"role": "user", "content": build_user_prompt(existing_posts)}]
+
+    title = body_html = ""
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        raw = call_claude(STYLE_GUIDE, messages)
+        try:
+            title, body_html = parse_draft(raw)
+            problems = house_style_problems(title, body_html)
+        except ValueError as e:
+            problems = [f"Your reply could not be used: {e}."]
+        if not problems:
+            break
+        print(f"Attempt {attempt}: draft broke house rules: {problems}", file=sys.stderr)
+        if attempt == MAX_ATTEMPTS:
+            print(
+                f"ERROR: still breaking house rules after {MAX_ATTEMPTS} attempts. "
+                "Refusing to write a file.",
+                file=sys.stderr,
+            )
+            print(f"Last raw output was:\n{raw}", file=sys.stderr)
+            sys.exit(1)
+        messages += [
+            {"role": "assistant", "content": raw},
+            {
+                "role": "user",
+                "content": "That draft breaks the house style rules:\n- "
+                + "\n- ".join(problems)
+                + "\nRevise it. Keep everything else the same, change only what "
+                "is needed, and reply with ONLY the corrected JSON object.",
+            },
+        ]
 
     if not title or len(body_html) < 400:
         print(
