@@ -139,6 +139,22 @@ permalink: "/book/"
 <p class="form-note" style="margin-top: 1.6em; color: var(--ink-soft);">Prices ($25.99 CAD / $19.99 USD) and retailer links are as of the book's Penguin Random House listing and may change before the May 18, 2027 release; double-check at checkout.</p>
 </div>
 </section>
+{% include upcoming-events.html book_only=true %}
+{%- if upcoming_events.size > 0 %}
+<section class="events-band" id="events" data-event-group>
+<div class="wrap">
+<div class="center" style="margin-bottom: 2em;">
+<span class="eyebrow">Experience the book in person</span>
+<h2>Learn the practices with Catherine</h2>
+</div>
+<div class="event-stack">
+{%- for e in upcoming_events %}
+{% include event-card.html event=e %}
+{%- endfor %}
+</div>
+</div>
+</section>
+{%- endif %}
 <section>
 <div class="wrap center narrow">
 <span class="eyebrow">About the co-author</span>

@@ -87,6 +87,38 @@ test.describe("every page @smoke", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Events (_data/events.yml). Read-only, so these also run against live.
+// ---------------------------------------------------------------------------
+test.describe("events @smoke", () => {
+  test("every listed event has an https registration button", async ({ page }) => {
+    await page.goto("/events/");
+    const cards = page.locator("[data-event-list] .event-card");
+    const n = await cards.count();
+    if (n === 0) {
+      await expect(page.locator("[data-events-empty]")).toBeVisible();
+      return;
+    }
+    for (let i = 0; i < n; i++) {
+      await expect(cards.nth(i).locator("h3")).not.toBeEmpty();
+      await expect(cards.nth(i).locator("a.btn.gold")).toHaveAttribute("href", /^https:\/\//);
+    }
+  });
+
+  test("events disappear on their own once they end", async ({ page }) => {
+    // Pretend it's far in the future: every event has ended, before any rebuild.
+    await page.clock.install({ time: new Date("2100-01-01T00:00:00Z") });
+    await page.goto("/events/");
+    await expect(page.locator("[data-event-list] .event-card:visible")).toHaveCount(0);
+    await expect(page.locator("[data-events-empty]")).toBeVisible();
+    await expect(page.locator('header a[href="/events/"]')).toBeHidden();
+    await page.goto("/");
+    await expect(page.locator("[data-event-group]")).toBeHidden();
+    await page.goto("/book/");
+    await expect(page.locator("[data-event-group]")).toBeHidden();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Interactive flows. Local only: third-party endpoints are faked.
 // ---------------------------------------------------------------------------
 test.describe("interactive flows", () => {

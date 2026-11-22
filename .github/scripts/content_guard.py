@@ -24,6 +24,7 @@ import pathlib
 import re
 import subprocess
 import sys
+from datetime import datetime
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 problems = []
@@ -73,7 +74,9 @@ TYPE_WORDS = re.compile(
     re.I,
 )
 
-for f in content_files + [ROOT / "_config.yml"]:
+EVENTS = ROOT / "_data" / "events.yml"
+style_files = content_files + [ROOT / "_config.yml"] + ([EVENTS] if EVENTS.exists() else [])
+for f in style_files:
     text = f.read_text(encoding="utf-8")
     scrubbed = PLACEHOLDER.sub("><", text)
     for m in DASH.finditer(scrubbed):
@@ -82,9 +85,49 @@ for f in content_files + [ROOT / "_config.yml"]:
             "Em/en dash found. House style: use a comma, colon, semicolon or parentheses instead.",
             line_of(scrubbed, m.start()),
         )
-    if f.suffix == ".html":
+    if f.suffix in {".html", ".yml"} and f.name != "_config.yml":
         for m in TYPE_WORDS.finditer(visible_text(text)):
             fail(f, f'"{m.group(0)}": house style says Enneagram "Points", not "Types".')
+
+# ---- 1b. Events data -------------------------------------------------------
+# Start/end must be full date-times with a timezone offset: the site compares
+# them to the build time to decide what is upcoming, and the nightly deploy
+# uses `end` to know when to rebuild. Links must be https.
+EVENT_TIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?([+-]\d{2}:\d{2}|Z)$")
+if EVENTS.exists():
+    ev_text = EVENTS.read_text(encoding="utf-8")
+    blocks = re.split(r"^- ", ev_text, flags=re.M)[1:]
+    for block in blocks:
+        title = re.search(r"^\s*title:\s*(.+)$", block, re.M)
+        name = title.group(1).strip().strip("\"'") if title else "(untitled event)"
+        start_line = line_of(ev_text, ev_text.find(block))
+        for key in ("title", "start", "end", "dates_label", "format", "location", "summary", "url"):
+            if not re.search(rf"^\s*{key}:\s*\S", block, re.M):
+                fail(EVENTS, f"Event {name} is missing `{key}`.", start_line)
+        times = {}
+        for key in ("start", "end"):
+            m = re.search(rf"^\s*{key}:\s*(\S+)\s*$", block, re.M)
+            if m and not EVENT_TIME.match(m.group(1)):
+                fail(
+                    EVENTS,
+                    f"Event {name}: `{key}` must look like 2027-05-26T18:30:00-07:00 "
+                    "(date, time and timezone offset, no quotes).",
+                    start_line,
+                )
+            elif m:
+                times[key] = m.group(1)
+        start_dt, end_dt = (
+            datetime.fromisoformat(times[k].replace("Z", "+00:00")) if k in times else None
+            for k in ("start", "end")
+        )
+        if start_dt and end_dt and end_dt <= start_dt:
+            fail(EVENTS, f"Event {name}: `end` is not after `start`.", start_line)
+        for m in re.finditer(r"^\s*(url|register_url):\s*\"?([^\"\s]+)", block, re.M):
+            if not m.group(2).startswith("https://"):
+                fail(EVENTS, f"Event {name}: `{m.group(1)}` must start with https://", start_line)
+        img = re.search(r"^\s*image:\s*\"?([^\"\s]+)", block, re.M)
+        if img and not (ROOT / img.group(1).lstrip("/")).is_file():
+            fail(EVENTS, f"Event {name}: image {img.group(1)} not found.", start_line)
 
 # ---- 2 + 3. Posts ---------------------------------------------------------
 POST_NAME = re.compile(r"^\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.(html|md)$")
@@ -188,6 +231,7 @@ if site.is_dir():
         "blog/index.html",
         "book/index.html",
         "contact/index.html",
+        "events/index.html",
     ):
         if not (site / needed).exists():
             fail(f"_site/{needed}", f"Built site is missing {needed}.")

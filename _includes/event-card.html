@@ -1,0 +1,26 @@
+{%- assign e = include.event -%}
+<article class="event-card" data-event-end="{{ e.end | date_to_xmlschema }}">
+  {%- if e.image %}
+  <img class="event-img" src="{{ e.image }}" alt="Catherine R. Bell" width="1067" height="600">
+  {%- endif %}
+  <div class="event-body">
+    <span class="eyebrow">{{ e.format }}</span>
+    <h3>{{ e.title }}</h3>
+    <p class="event-meta"><strong>{{ e.dates_label }}</strong> · {{ e.location }}</p>
+    <p>{{ e.summary | replace: "The Creative Moment", "<em>The Creative Moment</em>" }}</p>
+    {%- if include.full %}
+    {%- if e.price_label %}<p class="event-price">{{ e.price_label }}</p>{% endif %}
+    {%- if e.note %}<p class="event-note">{{ e.note }}</p>{% endif %}
+    {%- endif %}
+    <div class="event-actions">
+      <a class="btn gold" href="{{ e.register_url | default: e.url }}" target="_blank" rel="noopener">{{ e.cta | default: "Details &amp; registration" }}</a>
+      {%- if include.full %}
+      {%- if e.register_url %}
+      <a class="btn outline" href="{{ e.url }}" target="_blank" rel="noopener">Full program details</a>
+      {%- endif %}
+      {%- else %}
+      <a class="btn outline" href="/events/">More about this event</a>
+      {%- endif %}
+    </div>
+  </div>
+</article>

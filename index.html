@@ -25,6 +25,25 @@ description: "Catherine R. Bell, Enneagram & executive coach, keynote speaker, f
 <p class="press-strip-list">Fortune · Harvard Business Review · Profit · Conscious Company Magazine · Women of Influence</p>
 </div>
 </section>
+{% include upcoming-events.html %}
+{%- if upcoming_events.size > 0 %}
+<section class="events-band" data-event-group>
+<div class="wrap">
+<div class="center" style="margin-bottom: 2em;">
+<span class="eyebrow">Upcoming events</span>
+<h2>Join Catherine in person</h2>
+</div>
+<div class="event-stack">
+{%- for e in upcoming_events limit: 2 %}
+{% include event-card.html event=e %}
+{%- endfor %}
+</div>
+{%- if upcoming_events.size > 2 %}
+<p class="center" style="margin-top: 1.6em;"><a class="btn outline" href="/events/">See all events</a></p>
+{%- endif %}
+</div>
+</section>
+{%- endif %}
 <section class="tint">
 <div class="wrap narrow center">
 <span class="eyebrow">There is an awakening…</span>

@@ -33,6 +33,9 @@ nav:
     url: "/"
   - label: "The Book"
     url: "/book/"
+  - label: "Events"
+    url: "/events/"
+    events: true # only shown while there are upcoming events
   - label: "About"
     url: "/about/"
   - label: "Work With Catherine"

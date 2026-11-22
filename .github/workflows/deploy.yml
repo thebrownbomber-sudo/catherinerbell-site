@@ -9,11 +9,17 @@ name: Deploy site
 # last good version. If the post-deploy smoke test fails, the run goes red
 # and GitHub emails the repo owner. See SECURITY-AND-CI.md for rollback.
 #
+# Nightly: if an event in _data/events.yml ended in the last 48 hours, the
+# site is rebuilt so that event drops out of the HTML, the Events menu item
+# and Google's event data. On other nights this run does nothing.
+#
 # Requires: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
 on:
   push:
     branches: [master, main]
   workflow_dispatch: {}
+  schedule:
+    - cron: "23 7 * * *" # about 12:23am Mountain time
 
 permissions: {}
 
@@ -23,8 +29,37 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  events-gate:
+    name: Did an event just end?
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      due: ${{ steps.check.outputs.due }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Look for events that ended in the last 48 hours
+        id: check
+        run: |
+          ruby -ryaml -rdate -e '
+            events = YAML.safe_load(File.read("_data/events.yml"), permitted_classes: [Time, Date]) || []
+            now = Time.now
+            ended = events.select { |e| e["end"].is_a?(Time) && e["end"] <= now && e["end"] > now - 48 * 3600 }
+            ended.each { |e| warn "Ended: #{e["title"]} (#{e["end"]})" }
+            puts "due=#{!ended.empty?}"
+          ' >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+
   checks:
     name: CI checks
+    needs: events-gate
+    # Push and manual runs always deploy; nightly runs only when an event ended.
+    if: >-
+      !cancelled() && (github.event_name != 'schedule' || needs.events-gate.outputs.due == 'true')
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
@@ -33,6 +68,8 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: checks
+    # Explicit, because the skipped events-gate would otherwise skip this too.
+    if: ${{ !cancelled() && needs.checks.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
@@ -66,6 +103,7 @@ jobs:
   smoke:
     name: Smoke test live site
     needs: deploy
+    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

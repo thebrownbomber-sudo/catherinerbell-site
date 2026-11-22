@@ -1,0 +1,62 @@
+# Upcoming events, workshops, retreats and talks with Catherine.
+#
+# HOW TO ADD AN EVENT: copy one block below, paste it under the last one, and
+# change the values. Order doesn't matter; the site sorts by start date.
+#
+# HOW REMOVAL WORKS: nothing to do. An event disappears from the site on its
+# own once its `end` time has passed:
+#   1. Visitors' browsers hide it the moment it ends (assets/js/events.js).
+#   2. The "Deploy site" workflow rebuilds the site the night after an event
+#      ends, which drops it from the HTML, the Events menu item and Google's
+#      event data. If no events remain, the Events menu item is hidden.
+# Past entries can stay in this file as a record, or be deleted any time.
+#
+# Fields
+#   title          required  Event name
+#   start, end     required  Date + time WITH timezone offset, e.g.
+#                            2027-05-26T18:30:00-07:00 (Pacific summer = -07:00,
+#                            Mountain summer = -06:00, Eastern summer = -04:00)
+#   dates_label    required  How the dates read on the site
+#   format         required  e.g. "5-day residential retreat", "Keynote"
+#   location       required  Short place name shown on the card
+#   summary        required  One or two sentences, house style (no em dashes,
+#                            "Points" never "Types")
+#   url            required  Event's official info page (https)
+#   register_url   optional  Direct registration link (https); falls back to url
+#   cta            optional  Button text, default "Details & registration"
+#   price_label    optional  e.g. "From $1,547 CAD"
+#   note           optional  Small print, e.g. an early-bird deadline
+#   image          optional  Path under /assets/img/events/ (16:9 works best)
+#   book           optional  true = tied to The Creative Moment; also shown on
+#                            the Book page
+#   venue / address / city / region / postal / country  optional, for Google
+#   price_from / currency                                optional, for Google
+
+- title: "Awaken Your Creativity Through the Enneagram"
+  start: 2027-05-26T18:30:00-07:00
+  end: 2027-05-30T13:30:00-07:00
+  dates_label: "May 26 to 30, 2027"
+  format: "5-day residential retreat"
+  location: "Hollyhock, Cortes Island, BC"
+  venue: "Hollyhock"
+  address: "127-445 Highfield Road"
+  city: "Mansons Landing"
+  region: "BC"
+  postal: "V0P 1K0"
+  country: "CA"
+  summary: >-
+    One week after The Creative Moment is released, Catherine leads a five-day
+    immersion that brings the book to life. Through guided inquiry, somatic
+    practice and creative exercises, you will learn to recognize your creative
+    patterns, work with the inner obstacles that block them, and build a
+    creative practice that lasts. No Enneagram experience needed, though it
+    helps to know your Point.
+  url: "https://hollyhock.ca/programs/9141/awaken-your-creativity-27/"
+  register_url: "https://hollyhock.secure.retreat.guru/program/awaken-your-creativity-27/?form=1&lang=en"
+  cta: "Register at Hollyhock"
+  price_label: "From $1,547 CAD, meals included; lodging packages available"
+  price_from: 1547
+  currency: "CAD"
+  note: "Save 10% on accommodation when you book by February 24, 2027. Scholarships available through Hollyhock."
+  image: "/assets/img/events/hollyhock-2027-awaken-your-creativity.jpg"
+  book: true
