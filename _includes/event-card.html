@@ -1,7 +1,7 @@
 {%- assign e = include.event -%}
 <article class="event-card" data-event-end="{{ e.end | date_to_xmlschema }}">
   {%- if e.image %}
-  <img class="event-img" src="{{ e.image }}" alt="Catherine R. Bell" width="1067" height="600">
+  <img class="event-img" src="{{ e.image }}" alt="Catherine R. Bell" width="480" height="480">
   {%- endif %}
   <div class="event-body">
     <span class="eyebrow">{{ e.format }}</span>
