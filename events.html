@@ -1,0 +1,79 @@
+---
+layout: default
+title: "Events"
+description: "Upcoming retreats, workshops and talks with Catherine R. Bell, including in-person programs based on The Creative Moment."
+permalink: "/events/"
+---
+{% include upcoming-events.html %}
+<section class="page-hero">
+<div class="wrap narrow center">
+<span class="eyebrow">Events</span>
+<h1>Join Catherine in person</h1>
+<p class="lede">Retreats, workshops and talks where Catherine teaches the Enneagram and the creative practices at the heart of <em>The Creative Moment</em>.</p>
+</div>
+</section>
+<section style="padding-top: 0;">
+<div class="wrap narrow" data-event-list>
+{%- for e in upcoming_events %}
+{% include event-card.html event=e full=true %}
+{%- endfor %}
+<div class="card center events-empty" data-events-empty{% if upcoming_events.size > 0 %} hidden{% endif %}>
+<h2>No public events scheduled right now</h2>
+<p>New dates are shared first with the Weekly Inspiration list. Sign up below to hear about the next one.</p>
+</div>
+</div>
+</section>
+<section class="tint">
+<div class="wrap narrow center">
+<span class="eyebrow">Bring Catherine to your group</span>
+<h2>Keynotes &amp; creative facilitation</h2>
+<p>Catherine speaks and facilitates for organizations, conferences and leadership teams on creativity, the Enneagram and awakened culture.</p>
+<a class="btn outline" href="/coaching/#keynotes">Keynotes &amp; facilitation</a>
+<a class="btn gold" href="/contact/">Get in touch</a>
+</div>
+</section>
+{%- if upcoming_events.size > 0 %}
+<script type="application/ld+json">
+[
+{%- for e in upcoming_events %}
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": {{ e.title | jsonify }},
+  "description": {{ e.summary | jsonify }},
+  "startDate": "{{ e.start | date_to_xmlschema }}",
+  "endDate": "{{ e.end | date_to_xmlschema }}",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  {%- if e.image %}
+  "image": [{{ e.image | absolute_url | jsonify }}],
+  {%- endif %}
+  "location": {
+    "@type": "Place",
+    "name": {{ e.venue | default: e.location | jsonify }},
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": {{ e.address | jsonify }},
+      "addressLocality": {{ e.city | jsonify }},
+      "addressRegion": {{ e.region | jsonify }},
+      "postalCode": {{ e.postal | jsonify }},
+      "addressCountry": {{ e.country | jsonify }}
+    }
+  },
+  "performer": { "@type": "Person", "name": "Catherine R. Bell", "url": {{ site.url | jsonify }} },
+  "organizer": { "@type": "Organization", "name": {{ e.venue | default: "Catherine R. Bell" | jsonify }}, "url": {{ e.url | jsonify }} },
+  {%- if e.price_from %}
+  "offers": {
+    "@type": "Offer",
+    "url": {{ e.register_url | default: e.url | jsonify }},
+    "price": {{ e.price_from | jsonify }},
+    "priceCurrency": {{ e.currency | default: "CAD" | jsonify }},
+    "availability": "https://schema.org/InStock"
+  },
+  {%- endif %}
+  "url": {{ e.url | jsonify }}
+}{% unless forloop.last %},{% endunless %}
+{%- endfor %}
+]
+</script>
+{%- endif %}

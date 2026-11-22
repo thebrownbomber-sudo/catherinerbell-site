@@ -1,0 +1,10 @@
+{%- comment -%}
+  Sets `upcoming_events`: events from _data/events.yml whose end time is still
+  in the future at build time, sorted by start. Optional: book_only=true.
+  Usage: {% include upcoming-events.html %} then loop over upcoming_events.
+{%- endcomment -%}
+{%- assign upcoming_events = site.data.events | where_exp: "e", "e.end > site.time" | sort: "start" -%}
+{%- if include.book_only -%}
+  {%- assign upcoming_events = upcoming_events | where: "book", true -%}
+{%- endif -%}
+{%- assign upcoming_last_end = upcoming_events | sort: "end" | last -%}

@@ -1,3 +1,4 @@
+{%- include upcoming-events.html -%}
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="wordmark" href="/">Catherine&nbsp;R.&nbsp;Bell</a>
@@ -7,9 +8,10 @@
     </label>
     <nav class="site-nav">
       {% for item in site.nav %}
+      {% if item.events and upcoming_events.size == 0 %}{% continue %}{% endif %}
       {% assign is_active = false %}
       {% if page.url == item.url %}{% assign is_active = true %}{% endif %}
-      <a href="{{ item.url }}" class="{% if item.cta %}nav-cta{% endif %}{% if is_active %} active{% endif %}">{{ item.label }}</a>
+      <a href="{{ item.url }}" class="{% if item.cta %}nav-cta{% endif %}{% if is_active %} active{% endif %}"{% if item.events %} data-event-end="{{ upcoming_last_end.end | date_to_xmlschema }}"{% endif %}>{{ item.label }}</a>
       {% endfor %}
     </nav>
   </div>
