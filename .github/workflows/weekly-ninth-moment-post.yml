@@ -1,10 +1,10 @@
 name: Weekly Ninth Moment draft
 
-# Runs every Thursday at 9am Mountain Time (15:00 UTC during MDT, 16:00 UTC
-# during MST. GitHub Actions cron is always UTC and doesn't shift for DST,
-# so this is set for MDT; adjust the hour by 1 if it starts landing an hour
-# off after a daylight-saving change). Giving a few days before the Monday
-# newsletter send leaves time to review and merge.
+# Runs every Thursday at 9:17am Mountain Time (15:17 UTC; cron is always
+# UTC). The odd minute is deliberate: GitHub delays scheduled runs heavily at
+# the top of the hour (runs set for :00 started 5 to 7.5 hours late), and
+# off-peak minutes usually start much closer to on time. Giving a few days
+# before the Monday newsletter send leaves time to review and merge.
 #
 # You can also fire this manually any time from the Actions tab (see
 # workflow_dispatch below) without waiting for the schedule.
@@ -20,7 +20,7 @@ name: Weekly Ninth Moment draft
 #   malicious or malformed title cannot run commands.
 on:
   schedule:
-    - cron: "0 15 * * 4"
+    - cron: "17 15 * * 4"
   workflow_dispatch: {}
 
 # Nothing by default; each job asks for only what it needs.
